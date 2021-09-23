@@ -43,25 +43,29 @@ public class Main {
         int bevitel = -1;
         Scanner sc = new Scanner(System.in);
         while (bevitel != 0) {
-            for (Festmeny festmeny : festmenyek) {
-                System.out.println(festmeny);
+            for (int i = 0; i < festmenyek.size(); i++) {
+                System.out.println((i + 1) + "/" + (festmenyek.size()) + ": " + festmenyek.get(i));
             }
-            System.out.print("Melyikre szeretne licitálni? (1 - " + festmenyek.size() + "): ");
+            System.out.print("\t|Melyikre szeretne licitálni? (1 - " + festmenyek.size() + "): ");
             bevitel = sc.nextInt();
+            int dontes = -1;
             if (bevitel != 0 && bevitel < festmenyek.size() + 1) {
-                System.out.print("Hány százalékos licitlépcsőt kíván meglépni? (10%-100%): ");
-                int dontes = -1;
+                System.out.print("\t|Hány százalékos licitlépcsőt kíván meglépni? (10%-100%): ");
                 while (dontes > 100 || dontes < 10) {
                     dontes = sc.nextInt();
                     if (dontes > 100 || dontes < 10) {
-                        System.out.println("Hibás érték! (10-100)");
+                        System.out.print("\t|Hibás érték! (10-100): ");
                     }
                 }
+                festmenyek.get(bevitel - 1).licit(dontes);
+            } else if (bevitel > festmenyek.size() || bevitel < 0) {
+                System.out.print("\t|Hibás sorszám (1 - " + festmenyek.size() + "): ");
             }
         }
     }
 
     private static void ertekel() {
+        System.out.println("\nAz aukció lezárult\n");
         int nemkeltek = 0;
         for (Festmeny festmeny : festmenyek) {
             if (festmeny.getLicitekSzama() > 0) {
@@ -69,7 +73,6 @@ public class Main {
             } else {
                 nemkeltek++;
             }
-            System.out.println(festmeny);
         }
         int index = 0;
         while (index < festmenyek.size() && festmenyek.get(index).getLicitekSzama() != 10) {
@@ -81,12 +84,26 @@ public class Main {
             System.out.println("Nem volt olyan festmény, amire több mint 10 licit érkezett.");
         }
         System.out.println(nemkeltek + " darab el nem kelt festmény volt");
+        for (int i = festmenyek.size()-1; i > -1; i--) {
+            for (int j = 0; j < i+1; j++) {
+                if (festmenyek.get(i).getLegmagasabbLicit() > festmenyek.get(j).getLegmagasabbLicit()) {
+                    Festmeny x = festmenyek.get(i);
+                    festmenyek.set(i, festmenyek.get(j));
+                    festmenyek.set(j, x);
+                }
+            }
+        }
+        System.out.println("Festmények rendezve:\n");
+        for (Festmeny festmeny : festmenyek) {
+            if (festmeny.getElkelt()){
+                System.out.println("\t" + festmeny);
+            }
+        }
     }
 
     public static void main(String[] args) {
         init();
         felhasznaloiInterakcio();
-        System.out.println("Az aukció lezárult");
         ertekel();
     }
 }

@@ -53,33 +53,42 @@ public class Festmeny {
         licit(10);
     }
 
+    static private int trancsiroz(int mit) {
+        String mi = "" + mit;
+        double szamolas = Math.round((double) mit / Math.pow(10, mi.length() - 2));
+        return (int) (szamolas * Math.pow(10, mi.length() - 2));
+    }
+
+    static private int szazalekol(int mit, int szazalek) {
+        return trancsiroz((int) (mit + (mit / 100.0 * szazalek)));
+    }
+
     public void licit(int mertek) {
-        if (mertek > 100 || mertek < 10) {
-            System.out.println("Nem elfogadott licitlépcső (10 és 100 között kelle lennie)");
-        } else {
+        if (mertek <= 100 && mertek >= 10) {
+            double szazalek = mertek / 100.0 + 1;
             if (!getElkelt()) {
                 if (licitekSzama == 0) {
                     legmagasabbLicit = 100;
                 } else {
-                    legmagasabbLicit = (int) (getLegmagasabbLicit() * (mertek / 100)) / 100 * 100;
+                    legmagasabbLicit = szazalekol(getLegmagasabbLicit(), mertek);
                 }
-                this.licitekSzama++;
-                legutolsoLicitIdeje = LocalDateTime.now();
-            } else {
-                System.out.println("A festmény már elkelt!");
             }
+            this.licitekSzama++;
+            legutolsoLicitIdeje = LocalDateTime.now();
         }
     }
 
     @Override
     public String toString() {
-        String kiad = "elkelt";
+        String kiad = "elkelt " + legmagasabbLicit + "$-ért";
         String ido = "Nincs licit";
-        if(legutolsoLicitIdeje != null) {
+        boolean nincsLicit = true;
+        if (legutolsoLicitIdeje != null) {
             ido = legutolsoLicitIdeje.toString();
+            nincsLicit = false;
         }
         if (!getElkelt()) {
-            kiad = (legmagasabbLicit + "$ - " + ido + "(összesen: " + licitekSzama + " db)");
+            kiad = (legmagasabbLicit + "$ - " + ido + (nincsLicit ? "" : "(összesen: " + licitekSzama + " db)"));
         }
         return festo + " : " + cim + "(" + stilus + ")\n" + kiad;
     }
